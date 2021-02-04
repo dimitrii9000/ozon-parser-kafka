@@ -1,0 +1,47 @@
+version: "3"
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    networks:
+      kafka-ozon-network:
+        ipv4_address: 173.18.0.7
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 173.18.0.8
+      KAFKA_ZOOKEEPER_CONNECT: 173.18.0.7:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+    networks:
+      kafka-ozon-network:
+        ipv4_address: 173.18.0.8
+
+  ozon-worker:
+    image: ozon-worker
+    container_name: ozon-worker
+    volumes:
+      - ./logs:/opt/logs
+    restart: unless-stopped
+    expose:
+      - 80
+    networks:
+      kafka-ozon-network:
+        ipv4_address: 173.18.0.9
+
+  ozon-parser:
+    image: ozon-parser
+    volumes:
+      - ./logs:/opt/logs
+    restart: unless-stopped
+    networks:
+      - kafka-ozon-network
+
+networks:
+  kafka-ozon-network:
+    external: true
