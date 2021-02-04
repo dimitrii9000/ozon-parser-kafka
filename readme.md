@@ -4,6 +4,8 @@
 
 #### Состоит из 1 worker'а, скачивающего список товаров из категории по Ozon API и парсеров, обрабатывающих эти JSON списки (После получения списков, worker кладет их в топик ozon-category kafka, откуда его и берет parser; после обработки parser складывает товары в топик ozon-products)
 
+#### В проекте уже есть kafka и zookeeper, поэтому он не зависит от внешних модулей
+
 #### Требования:
 * Docker
 * Python3
@@ -27,6 +29,9 @@ curl -H "Content-Type: application/json" -d '{"link": "https://www.ozon.ru/categ
 * StatusCode = 500 - внутренняя ошибка (стоит посмотреть логи)
 
 ### Принцип работы:
+
+#### docker-compose.yml:
+* Создаются 4 основных контейнера (kafka, zookeeper, ozon-worker, kafka-project_ozon-parser_ и дополнительные парсеры (если указано в настройках))
 
 #### control.py:
 Есть возможность запустить с 3-мя флагами:
